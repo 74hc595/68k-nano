@@ -242,6 +242,7 @@ project ideas that I won't have time to tackle, but you're welcome to:
 - Running an existing 68k monitor like [TUTOR](http://www.easy68k.com/paulrsm/mecb/mecb.htm)
   or [zBug](http://www.kswichit.com/68k/68k.html).
 - Running a language like [EhBASIC](https://github.com/jefftranter/68000/tree/master/ehbasic) or a Forth.
+- Adding FAT16 write support.
 - Booting [uClinux](https://www.bigmessowires.com/2014/11/17/68-katy-68000-linux-on-a-solderless-breadboard/) like Steve Chamberlin did with [68 Katy](https://www.bigmessowires.com/category/68katy/).
 - Using the DS3234 real-time clock's SQW output to generate a periodic interrupt.
   (likely necessary for uClinux)
