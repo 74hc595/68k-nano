@@ -1,0 +1,29 @@
+Ref     Part                                            Distributor SKU
+----------------------------------------------------------------------------------------------------------
+C1-C10  0.1uF decoupling capacitor (ceramic/monolithic)
+C11,C12 10uF electrolytic capacitor, 16V+
+D1-D2   1N5817 Schottky diode (1N4148 also works)
+D3-D6   5mm LED (your choice of color)
+J1      USB-B PCB-mount right-angle connector           Jameco 2096245
+J2      6-position 0.1" male right-angle header
+J3      (optional) 7-position 0.1" header
+J4      2x22 2mm header
+JP1     3-position 0.1" male straight header + jumper
+R1,R2   10k resistor, 1/4W
+R3      1k resistor, 1/4W
+R4-R7   Resistors for LEDs D3-D6 (330/1k)
+RN1     10k bussed resistor network (SIP-7)
+SW1,SW2 6mm tactile switch
+U1      74HC139 dual 2-to-4 line decoder (DIP-16)
+U2      74HC14 hex inverting Schmitt trigger (DIP-14)
+U3      68000 microprocessor (DIP-64)                   Jameco 2288039
+U4,U6   AS6C4008-55PCN 512Kx8 static RAM (DIP-32)       Jameco 242448           Mouser 913-AS6C4008-55PCN
+U5,U7   AT28C256 32Kx8 EEPROM (DIP-28)                  Jameco 74843            Mouser 556-AT28C25615PU
+U8      TL16C550 UART (DIP-40)                          Jameco 288809
+X1      5V oscillator (DIP-8 or DIP-14)
+
+Optional peripherals
+--------------------
+Low profile ZIF-28 sockets for U5/U7 - Jameco 102745 (Aries 28-526-10)
+SparkFun DeadOn RTC Breakout - https://www.sparkfun.com/products/10160
+CompactFlash to 2.5" 44-pin IDE adapter - https://www.amazon.com/gp/product/B07Y2MTS13

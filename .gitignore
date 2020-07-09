@@ -1,0 +1,12 @@
+.DS_Store
+*.swp
+*.bck
+*.kicad_pcb-bak
+*.sch-bak
+fp-info-cache
+*-cache.lib
+gerbers/
+*.hex
+*.lst
+*.bin
+*.srec
