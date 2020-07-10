@@ -3,7 +3,7 @@
 A minimal single-board computer based on the venerable ["Texas Cockroach"](https://youtu.be/UaHtGf4aRLs?t=2074)
 Motorola 68000 16/32-bit microprocessor.
 
-[!][Board image](/images/board.jpg)
+![Board image](/images/board.jpg)
 
 ## Features
 
