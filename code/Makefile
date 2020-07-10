@@ -10,7 +10,7 @@ BAUD  = 57600
 
 # make         - build test program
 # make load    - load test program binary using serial loader
-TESTPROG  = fat16
+TESTPROG  = fizzbuzz
 
 # make rom     - build ROM image
 # make burnrom - burn ROM image to EEPROMs using minipro
