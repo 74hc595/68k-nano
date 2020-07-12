@@ -3,10 +3,10 @@
         include "68000sbc.inc"
 
 ROM_VER_MAJ     equ     $0000
-ROM_VER_MIN     equ     $9900
+ROM_VER_MIN     equ     $9910
 ROM_DATE_YEAR   equ     $2020
 ROM_DATE_MONTH  equ     $07
-ROM_DATE_DAY    equ     $08
+ROM_DATE_DAY    equ     $11
 
 BAUD_DIV        equ     (((F_CPU*10)/(16*BAUD))+5)/10 ; compute one extra decimal place and round
 BAUD_DIV_L      equ     (BAUD_DIV&$FF)
@@ -68,6 +68,8 @@ RESET:
                 bclr.b  #7,LCR(a1)              ; disable divisor latch
                 clr.b   SCR(a1)                 ; clear the scratch register
                 move.b  #(1<<MCR_COPI),MCR(a1)  ; SPI COPI idles low
+        ; read the button state at launch
+                move.b  MSR(a1),SCR(a1)         ; save the button state into the scratch register
 ; Welcome message
                 led_on
                 lea.l   str_startup,a0
@@ -204,6 +206,9 @@ ready:
                 move.l  d0,-(sp)
                 sys     OutFmt
                 addq    #8,sp
+        ; check the button state at boot (stored in the uart scratch register)
+                btst.b  #MSR_BTN1,UART+SCR
+                bne     .skipstartup
         ; see if there's a startup file to run
                 moveq   #-1,d0          ; TODO fail if binary too big
                 lea.l   APPMEMSTART,a1  ; destination
@@ -216,36 +221,40 @@ ready:
                 sys     OutStr
                 bra     launchapp
 
+
 .nostartup:     move.w  d0,-(sp)        ; error number
                 litstr  "CANNOT LOAD STARTUP.BIN - ",FMT_ERR,"\n"
                 sys     OutFmt
                 addq    #2,sp
                 bra     idle
+
+.skipstartup    litstr  "BYPASSING STARTUP.BIN\n"
+                sys     OutStr
 idle:
                 bra     startshell
-                litstr  "WAITING FOR SERIAL DATA.\n"
-                sys     OutStr
-        ; slowly fade the LED in and out to indicate we're ready
-animate_led:
-fadespeed       equ     6
-                moveq   #0,d1  ; duty cycle
-                moveq   #fadespeed,d2  ; number of periods with given duty cycle
-                led_on
-.cycle:         move.l  #255,d0
-                led_tgl
-.loop:          cmp.b   d0,d1   ; invert LED waveform when count == duty cycle value
-                bne     .1
-                led_tgl
-.1:             dbra    d0,.loop
-                dbra    d2,.cycle
-        ; increment duty cycle
-                addq    #1,d1
-        ; when duty cycle == 0, invert waveform (change fade direction)
-                cmp.b   #0,d1
-                bne     .2
-                led_tgl
-.2:             moveq   #fadespeed,d2
-                bra     .cycle
+;                 litstr  "WAITING FOR SERIAL DATA.\n"
+;                 sys     OutStr
+;         ; slowly fade the LED in and out to indicate we're ready
+; animate_led:
+; fadespeed       equ     6
+;                 moveq   #0,d1  ; duty cycle
+;                 moveq   #fadespeed,d2  ; number of periods with given duty cycle
+;                 led_on
+; .cycle:         move.l  #255,d0
+;                 led_tgl
+; .loop:          cmp.b   d0,d1   ; invert LED waveform when count == duty cycle value
+;                 bne     .1
+;                 led_tgl
+; .1:             dbra    d0,.loop
+;                 dbra    d2,.cycle
+;         ; increment duty cycle
+;                 addq    #1,d1
+;         ; when duty cycle == 0, invert waveform (change fade direction)
+;                 cmp.b   #0,d1
+;                 bne     .2
+;                 led_tgl
+; .2:             moveq   #fadespeed,d2
+;                 bra     .cycle
 
 ;===============================================================================
 ; Syscalls
@@ -730,6 +739,8 @@ SYS_InChar:     move.l  INCH_VEC,a1
 ; Control characters supported:
 ; ^C - return immediately with an empty string
 ; ^H - backspace one character
+; ^? (DEL) - baskspace one character
+; ^M (CR) - translated to ^J (LF)
 SYS_PromptStr:  pushm   a0/a2-a3/d2
                 move.l  a0,a2           ; pointer within buffer
                 lea.l   (a0,d0),a3      ; pointer to end of buffer
@@ -737,15 +748,21 @@ SYS_PromptStr:  pushm   a0/a2-a3/d2
 
 .prompt:        move.l  INCH_VEC,a1     ; get character
                 jsr     (a1)
-                cmp.b   d0,d2
+.tstchar:       cmp.b   d0,d2
                 beq     .founddelim     ; if it's the delimiter character, we're done
                 btst.l  #PRbNOCTRLCHARS,d2      ; check for control chars?
                 bne     .noctrlchar
         ; check if it's a control character
                 cmp.b   #$08,d0         ; backspace
                 beq     .backspace
+                cmp.b   #$7f,d0         ; delete
+                beq     .backspace
                 cmp.b   #$03,d0         ; ctrl-c
                 beq     .abort
+                cmp.b   #$0d,d0         ; CR -> LF
+                bne     .noctrlchar
+                moveq   #$0a,d0
+                bra     .tstchar
 .noctrlchar:    cmp.l   a2,a3           ; is there room in the string?
                 beq     .prompt         ; if not, ignore the character
         ; there is room in the string and the character is not a delimiter
@@ -2038,10 +2055,10 @@ showtime:       sys     GetDateTime
                 sys     OutFmt
                 addq    #8,sp
                 bra     shell
-.no_rtc:        litstr  "NO REAL-TIME CLOCK DETECTED"
+.no_rtc:        litstr  "\nNO REAL-TIME CLOCK DETECTED"
                 sys     OutStr
                 bra     shell
-.timenotset:    litstr  "TIME NOT SET"
+.timenotset:    litstr  "\nTIME NOT SET"
                 sys     OutStr
                 bra     shell
 

@@ -143,9 +143,12 @@ on a breadboard at higher clock speeds.)
 time to the serial port.
 - Check for a CompactFlash card, and attempt to mount the first partition if it
 is FAT16-formatted.
-- If a valid card is inserted, check for a file in the root directory named
-`STARTUP.BIN`. If found, load it into RAM and execute it.
-- If `STARTUP.BIN` was not loaded, enter an interactive command shell.
+- If the "ENTER" pushbutton is NOT held down:
+  - If a valid card is inserted, check for a file in the root directory named
+    `STARTUP.BIN`. If found, load it into RAM and execute it.
+  - If `STARTUP.BIN` was not loaded, enter an interactive command shell.
+- If the "ENTER" pushbutton is held down, enter the interactive command shell
+  and bypass execution of `STARTUP.BIN`.
 
 Example startup sequence (without `STARTUP.BIN`):
 ```

@@ -165,8 +165,10 @@ fmtstr: dc.b    "[",FMT_H8,"]",0
     space for `D0`+1 bytes.
   - If bit 9 of `D1` is clear, the following control characters are interpreted:
     - **Ctrl-C** (`$03`): return immediately with an empty string
-    - **Ctrl-H** (`$08`): delete most-recently-entered character from the input buffer
-      and (if bit 8 of `D1` is clear) output a backspace escape sequence
+    - **Ctrl-H** (`$08`, **DEL** (`$7F`): delete most-recently-entered character
+      from the input buffer and (if bit 8 of `D1` is clear) output a backspace
+      escape sequence
+    - **Ctrl-M** (`CR`, `$0D`): translated to Ctrl-J (`LF`, `$0A`)
 - **Example:**
 ```
 ; ask for the user's name
